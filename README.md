@@ -1,4 +1,4 @@
-# :beers: COMP 472 – Assignment 1 :shipit:
+# :beers: COMP 472 – Assignment 1 :tiger:
 
 ---
 
