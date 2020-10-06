@@ -9,28 +9,68 @@ import sklearn.linear_model.perceptron
 import sklearn.neural_network.multilayer_perceptron
 
 def plot_data(data):
+    """
+
+    :param data:
+    :return:
+    """
     return
 
 def output_to_csv(data):
+    """
+
+    :param data:
+    :return:
+    """
     return
 
 def GNB(data):
+    """
+
+    :param data:
+    :return:
+    """
     return
 
 def Base_DT(data):
+    """
+
+    :param data:
+    :return:
+    """
     return
 
 def Best_DT(data):
+    """
+
+    :param data:
+    :return:
+    """
     return
 
 def PER(data):
+    """
+
+    :param data:
+    :return:
+    """
     return
 
 def Base_MLP(data):
+    """
+
+    :param data:
+    :return:
+    """
     return
 
 
 def Best_MLP(data):
+    """
+
+    :param data:
+    :return:
+    """
     return
 
 
