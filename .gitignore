@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#Ignore local output CSV files
+*.csv
+
 #IDE files
 .idea
 .DS_Store
