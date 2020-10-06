@@ -9,67 +9,107 @@ import sklearn.linear_model.perceptron
 import sklearn.neural_network.multilayer_perceptron
 
 def plot_data(data):
-    """
+    """ Description
 
-    :param data:
-    :return:
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataframe containing 1 dataset
+
+    Returns
+    -------
     """
     return
 
 def output_to_csv(data):
-    """
+    """ Description
 
-    :param data:
-    :return:
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataframe containing 1 dataset
+
+    Returns
+    -------
     """
     return
 
 def GNB(data):
-    """
+    """ Description
 
-    :param data:
-    :return:
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataframe containing 1 dataset
+
+    Returns
+    -------
     """
     return
 
 def Base_DT(data):
-    """
+    """ Description
 
-    :param data:
-    :return:
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataframe containing 1 dataset
+
+    Returns
+    -------
     """
     return
 
 def Best_DT(data):
-    """
+    """ Description
 
-    :param data:
-    :return:
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataframe containing 1 dataset
+
+    Returns
+    -------
     """
     return
 
 def PER(data):
-    """
+    """ Description
 
-    :param data:
-    :return:
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataframe containing 1 dataset
+
+    Returns
+    -------
     """
     return
 
 def Base_MLP(data):
-    """
+    """ Description
 
-    :param data:
-    :return:
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataframe containing 1 dataset
+
+    Returns
+    -------
     """
     return
 
 
 def Best_MLP(data):
-    """
+    """ Description
 
-    :param data:
-    :return:
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataframe containing 1 dataset
+
+    Returns
+    -------
     """
     return
 
