@@ -24,9 +24,13 @@ def plot_data(data):
     plt.figure(figsize=(12, 8))
     ax = sns.countplot(df1[df1.columns[-1]].map(LATIN_ALPHABET), order=LATIN_ALPHABET.values(), palette='colorblind')
     ax.set(xlabel='Letters', ylabel='Count', title='Count Of Letters In Dataset 1')
+    ax.axhline(df1[df1.columns[-1]].shape[0] / 26, color='red', label='Uniform Distribution')
+    plt.legend()
     plt.show()
     ax = sns.countplot(df2[df2.columns[-1]].map(GREEK_ALPHABET), order=GREEK_ALPHABET.values(), palette='colorblind')
     ax.set(xlabel='Letters', ylabel='Count', title='Count Of Letters In Dataset 2')
+    ax.axhline(df2[df2.columns[-1]].shape[0] / 10, color='red', label='Uniform Distribution')
+    plt.legend()
     plt.show()
 
     return
