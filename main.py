@@ -1,10 +1,18 @@
-# Imports
+# General Imports
 import pandas as pd
 import seaborn as sns
+sns.set_style("darkgrid")
 import matplotlib.pyplot as plt
 import numpy as np
+
+# Sklearn imports. Uncomment as you need, it gets long to run otherwise
 from sklearn.metrics import precision_recall_fscore_support  # f1 by default
-sns.set_style("darkgrid")
+from sklearn.naive_bayes import GaussianNB
+# from sklearn.tree import DecisionTreeClassifier
+# from sklearn.linear_model import Perceptron
+# from sklearn.neural_network import MLPClassifier
+
+# Constant alphabet maps
 LATIN_ALPHABET = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I', 9: 'J', 10: 'K', 11: 'L',
                   12: 'M', 13: 'N', 14: 'O', 15: 'P', 16: 'Q', 17: 'R', 18: 'S', 19: 'T', 20: 'U', 21: 'V', 22: 'W',
                   23: 'X', 24: 'Y', 25: 'Z'}
@@ -38,23 +46,43 @@ def plot_data(data):
     return
 
 
-def output_to_csv(data):
+def output_metrics_and_csv(y_pred,y_true,model_name,dataset_id):
     """ Description
-
+    Compute metrics and output predictions of dataset to csv file
     Parameters
     ----------
-    data: tuple
-        Tuple of (y-instance, prediction)
+    y_pred: nd.array
+    y_true: nd.array
+    model_name: string
+    dataset_id: int
+        y_pred, y_true: arrays of predicted classes and true classes for a dataset
+        model_name: name of model result's being outputted
+        dataset_id: id of dataset being outputted (1 or 2)
 
     Returns
     -------
     """
+
+    # Get metrics TODO Clarify which are pertinent
+    precision_per_class, recall_per_class, f1_per_class = precision_recall_fscore_support(y_true, y_pred)
+    precision_weighted, recall_weighted, f1_weighted = precision_recall_fscore_support(y_true, y_pred, average='weighted')
+    precision_macro, recall_macro, f1_macro = precision_recall_fscore_support(y_true, y_pred,average='macro')
+
+    # Prepare Result
+    # TODO Confusion matrix is included in output csv? Formatting of metrics in output file?
+    output_pred = zip(np.arange(y_pred.shape[0]), y_pred)  # In format (y_instance,prediction)
+
+    #Output to CSV
+    pd.DataFrame(output_pred).to_csv('%s-DS%d.csv' % (model_name, dataset_id), index=False, header=['y_instance', 'class'])
+
+
     return
 
 
 def GNB(train, val):
     from sklearn.naive_bayes import GaussianNB
     """ Description
+    
     Parameters
     ----------
     train: tuple of pd.DataFrame
@@ -76,19 +104,12 @@ def GNB(train, val):
     gnb.fit(X, Y)
 
     # Get predictions and true labels of dataset1
-    Y_pred = gnb.predict(np.array(df1_val)[:, :1024])
-    Y_true = df1_val[df1_val.columns[-1]]
+    y_pred = gnb.predict(np.array(df1_val)[:, :1024])
+    y_true = df1_val[df1_val.columns[-1]]
 
-    # Get metrics of dataset1
-    # TODO Clarify which are pertinent
-    precision_per_class, recall_per_class, f1_per_class = precision_recall_fscore_support(Y_true, Y_pred)
-    precision_weighted, recall_weighted, f1_weighted = precision_recall_fscore_support(Y_true, Y_pred, average='weighted')
-    precision_macro, recall_macro, f1_macro = precision_recall_fscore_support(Y_true, Y_pred,average='macro')
+    # Output predictions and metrics of dataset1 to CSV
+    output_metrics_and_csv(y_pred, y_true,'GNB',1)
 
-    # Output result of dataset1
-    # TODO Confusion matrix is included in output csv? Formatting of metrics in output file?
-    output_pred = zip(np.arange(Y_pred.shape[0]), Y_pred)  # In format (y_instance,prediction)
-    output_to_csv(output_pred)
 
     # Apply model to dataset2
     X = df2_train[df2_train.columns[:-1]]
@@ -99,22 +120,13 @@ def GNB(train, val):
     Y_pred = gnb.predict(np.array(df2_val)[:, :1024])
     Y_true = df2_val[df2_val.columns[-1]]
 
-    # Get metrics of dataset2
-    # TODO Clarify which are pertinent
-    precision_per_class, recall_per_class, f1_per_class = precision_recall_fscore_support(Y_true, Y_pred)
-    precision_weighted, recall_weighted, f1_weighted = precision_recall_fscore_support(Y_true, Y_pred, average='weighted')
-    precision_macro, recall_macro, f1_macro = precision_recall_fscore_support(Y_true, Y_pred,average='macro')
-
-    # Output result of dataset2
-    # TODO Confusion matrix is included in output csv? Formatting of metrics in output file?
-    output_pred = zip(np.arange(Y_pred.shape[0]), Y_pred)  # In format (y_instance,prediction)
-    output_to_csv(output_pred)
+    # Output predictions and metrics of dataset2 to CSV
+    output_metrics_and_csv(y_pred, y_true,'GNB',2)
 
     return
 
 
 def Base_DT(train, val):
-    import sklearn.tree
     """ Description
 
     Parameters
@@ -135,21 +147,16 @@ def Base_DT(train, val):
 
     # Get predictions and true labels of dataset1
 
-    # Get metrics of dataset1
-
-    # Output result of dataset1
+    # Output predictions and metrics of dataset1 to CSV
 
     # Apply model to dataset2
 
     # Get predictions and true labels of dataset2
 
-    # Get metrics of dataset2
-
-    # Output result of dataset2
+    # Output predictions and metrics of dataset2 to CSV
 
 
 def Best_DT(train, val):
-    import sklearn.tree
     """ Description
 
     Parameters
@@ -170,23 +177,18 @@ def Best_DT(train, val):
 
     # Get predictions and true labels of dataset1
 
-    # Get metrics of dataset1
-
-    # Output result of dataset1
+    # Output predictions and metrics of dataset1 to CSV
 
     # Apply model to dataset2
 
     # Get predictions and true labels of dataset2
 
-    # Get metrics of dataset2
-
-    # Output result of dataset2
+    # Output predictions and metrics of dataset2 to CSV
 
     return
 
 
 def PER(train, val):
-    import sklearn.linear_model.perceptron
     """ Description
 
     Parameters
@@ -207,23 +209,18 @@ def PER(train, val):
 
     # Get predictions and true labels of dataset1
 
-    # Get metrics of dataset1
-
-    # Output result of dataset1
+    # Output predictions and metrics of dataset1 to CSV
 
     # Apply model to dataset2
 
     # Get predictions and true labels of dataset2
 
-    # Get metrics of dataset2
-
-    # Output result of dataset2
+    # Output predictions and metrics of dataset2 to CSV
 
     return
 
 
 def Base_MLP(train, val):
-    import sklearn.neural_network.multilayer_perceptron
     """ Description
 
     Parameters
@@ -244,23 +241,18 @@ def Base_MLP(train, val):
 
     # Get predictions and true labels of dataset1
 
-    # Get metrics of dataset1
-
-    # Output result of dataset1
+    # Output predictions and metrics of dataset1 to CSV
 
     # Apply model to dataset2
 
     # Get predictions and true labels of dataset2
 
-    # Get metrics of dataset2
-
-    # Output result of dataset2
+    # Output predictions and metrics of dataset2 to CSV
 
     return
 
 
 def Best_MLP(train, val):
-    import sklearn.neural_network.multilayer_perceptron
     """ Description
 
     Parameters
@@ -281,17 +273,13 @@ def Best_MLP(train, val):
 
     # Get predictions and true labels of dataset1
 
-    # Get metrics of dataset1
-
-    # Output result of dataset1
+    # Output predictions and metrics of dataset2 to CSV
 
     # Apply model to dataset2
 
     # Get predictions and true labels of dataset2
 
-    # Get metrics of dataset2
-
-    # Output result of dataset2
+    # Output predictions and metrics of dataset2 to CSV
 
     return
 
