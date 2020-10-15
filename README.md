@@ -33,6 +33,8 @@ Execute the main() function of ```main.py```. This will execute the following fu
     Base_MLP(df_train, df_val)
     Best_MLP(df_train, df_val)
 ```
+2 plots *dataset#_plot.png* of the overall dataset distribution are also generated in the root result directory.
+
 For every model/dataset pair, the following are generated: 
 1.  A *model-name_dataset#*.csv formatted as such in that order
     * 1 ```Instance,Predicted``` line per instance of test dataset
@@ -40,9 +42,6 @@ For every model/dataset pair, the following are generated:
     * 1 ```Accuracy, Macro F-1, Weighted F-1``` line.
     
 2. A *model-name-dataset#_Confusion_Matrix*.png file of the confusion matrix plot. 
-
-2 plots *dataset#_plot.png* of the overall dataset distribution are also generated in the root result directory.
-
 
 These files are organized in a directory structure as follows: 
 ```
