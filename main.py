@@ -44,7 +44,23 @@ def plot_data(data):
     plt.legend()
     plt.show()
 
-    
+def plot_confusion_matrix(y_pred,y_true,dataset_id):
+    if(dataset_id==1):
+        local_dict=LATIN_ALPHABET
+    else:
+        local_dict=GREEK_ALPHABET
+    conf_mx = confusion_matrix(y_true, y_pred)
+    df_cm = pd.DataFrame(conf_mx, index=local_dict.values(), columns=local_dict.values())
+    row_sum = df_cm.sum(axis=1)
+    df_cm = df_cm / row_sum
+    plt.figure(figsize=(20, 16))
+    heatmap = sns.heatmap(df_cm, cbar='False', cmap='coolwarm', annot=True)
+    heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=14)
+    heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=0, ha='right', fontsize=14)
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.title('Normalized Confusion Matrix')
+    return heatmap
 
 def output_metrics_and_csv(y_pred,y_true,model_name,dataset_id):
     """ Description
@@ -84,7 +100,6 @@ def output_metrics_and_csv(y_pred,y_true,model_name,dataset_id):
     df_2.to_csv('results/%s-DS%d.csv' % (model_name, dataset_id), header=True, mode='a')
    
     return
-
 
 def GNB(train, val):
     from sklearn.naive_bayes import GaussianNB
@@ -132,7 +147,6 @@ def GNB(train, val):
 
     return
 
-
 def Base_DT(train, val):
     from sklearn.tree import DecisionTreeClassifier
     """ Description
@@ -169,7 +183,6 @@ def Base_DT(train, val):
     y_true = df2_val[df2_val.columns[-1]]
     # Output predictions and metrics of dataset2 to CSV
     output_metrics_and_csv(y_pred, y_true,'Base-DT',2)
-
 
 def Best_DT(train, val):
     from sklearn.tree import DecisionTreeClassifier
@@ -219,7 +232,6 @@ def Best_DT(train, val):
 
     return
 
-
 def PER(train, val):
     """ Description
 
@@ -257,7 +269,6 @@ def PER(train, val):
     output_metrics_and_csv(pred, true, "Perceptron", 2)
     return
 
-
 def Base_MLP(train, val):
     """ Description
 
@@ -294,7 +305,6 @@ def Base_MLP(train, val):
     # Output predictions and metrics of dataset2 to CSV
     output_metrics_and_csv(pred, true, "Base-MLP", 2)
     return
-
 
 def Best_MLP(train, val):
     from sklearn.neural_network import MLPClassifier
@@ -341,7 +351,6 @@ def Best_MLP(train, val):
     output_metrics_and_csv(pred, true, "Base-MLP", 2)
 
     return
-
 
 def main():
     # Load datasets splits as tuples of each type
