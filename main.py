@@ -44,8 +44,6 @@ def plot_data(data):
     plt.legend()
     plt.show()
 
-    
-
 def output_metrics_and_csv(y_pred,y_true,model_name,dataset_id):
     """ Description
     Compute metrics and output predictions of dataset to csv file
@@ -84,7 +82,6 @@ def output_metrics_and_csv(y_pred,y_true,model_name,dataset_id):
     df_2.to_csv('results/%s-DS%d.csv' % (model_name, dataset_id), header=True, mode='a')
    
     return
-
 
 def GNB(train, val):
     from sklearn.naive_bayes import GaussianNB
@@ -130,9 +127,6 @@ def GNB(train, val):
     # Output predictions and metrics of dataset2 to CSV
     output_metrics_and_csv(y_pred, y_true,'GNB',2)
 
-    return
-
-
 def Base_DT(train, val):
     from sklearn.tree import DecisionTreeClassifier
     """ Description
@@ -170,7 +164,6 @@ def Base_DT(train, val):
     # Output predictions and metrics of dataset2 to CSV
     output_metrics_and_csv(y_pred, y_true,'Base-DT',2)
 
-
 def Best_DT(train, val):
     from sklearn.tree import DecisionTreeClassifier
     """ Description
@@ -189,7 +182,7 @@ def Best_DT(train, val):
 
     # Define Model
     Best_Decision_tree=DecisionTreeClassifier()
-    param_grid={'criterion':['entropy'],'max_depth':[26,27,28],'min_samples_split':[5],'min_impurity_decrease':[0,0.001],'class_weight':[None]}   
+    param_grid={'criterion':['gini'],'max_depth':[26,27,28],'min_samples_split':[5],'min_impurity_decrease':[0,0.001],'class_weight':[None]}
      # Apply model to dataset1
     grid_search=GridSearchCV(Best_Decision_tree,param_grid,cv=16,return_train_score=True)
     # Get predictions and true labels of dataset1
@@ -202,23 +195,22 @@ def Best_DT(train, val):
     y_true = df1_val[df1_val.columns[-1]]
     # Output predictions and metrics of dataset1 to CSV
     output_metrics_and_csv(y_pred, y_true,'Best-DT',1)
-    # Apply model to dataset2
-    # X = df2_train[df2_train.columns[:-1]]
-    # Y = df2_train[df2_train.columns[-1]]
-    # param_grid={'criterion':['gini','entropy'],'max_depth':[5,10],'min_samples_split':[2,3,5],'min_impurity_decrease':[0.5,1],'class_weight':[None,'balanced']}   
-    # # Apply model to dataset1
-    # grid_search=GridSearchCV(Best_Decision_tree,param_grid,cv=10,return_train_score=True)
-    # grid_search.fit(X,Y)
-    # final_model=grid_search.best_estimator_
-    # print(grid_search.best_estimator_)
-    # # Get predictions and true labels of dataset2
-    # y_pred = final_model.predict(np.array(df2_val)[:, :1024])
-    # y_true = df2_val[df2_val.columns[-1]]
-    # # Output predictions and metrics of dataset2 to CSV
-    # output_metrics_and_csv(y_pred, y_true,'Best-DT',2)
 
+    # Define X,Y for dataset 2
+    X = df2_train[df2_train.columns[:-1]]
+    Y = df2_train[df2_train.columns[-1]]
+    param_grid={'criterion':['gini','entropy'],'max_depth':[5,10],'min_samples_split':[2,3,5],'min_impurity_decrease':[0.5,1],'class_weight':[None,'balanced']}
+    # Gridsearch hyperparameters
+    grid_search=GridSearchCV(Best_Decision_tree,param_grid,cv=10,return_train_score=True)
+    grid_search.fit(X,Y)
+    final_model=grid_search.best_estimator_
+    print(grid_search.best_estimator_)
+    # Get predictions and true labels of dataset2
+    y_pred = final_model.predict(np.array(df2_val)[:, :1024])
+    y_true = df2_val[df2_val.columns[-1]]
+    # Output predictions and metrics of dataset2 to CSV
+    output_metrics_and_csv(y_pred, y_true,'Best-DT',2)
     return
-
 
 def PER(train, val):
     """ Description
@@ -283,7 +275,6 @@ def Base_MLP(train, val):
 
     return
 
-
 def Best_MLP(train, val):
     """ Description
 
@@ -315,7 +306,6 @@ def Best_MLP(train, val):
 
     return
 
-
 def main():
     # Load datasets splits as tuples of each type
     df_train = (pd.read_csv('data/train_1.csv'), pd.read_csv('data/train_2.csv'))
@@ -327,8 +317,9 @@ def main():
     #plot_data(df_train)
 
     # Run models
-    Best_DT(df_train,df_val)
     #GNB(df_train,df_val)
+    #Base_DT(df_train, df_val)
+    Best_DT(df_train, df_val)
     return
 
 
