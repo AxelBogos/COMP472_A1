@@ -164,7 +164,7 @@ def Base_DT(train, val):
     # Output predictions and metrics of dataset2 to CSV
     output_metrics_and_csv(y_pred, y_true,'Base-DT',2)
 
-def Best_DT(train, val):
+def Best_DT(train, val,use_default_param=True):
     from sklearn.tree import DecisionTreeClassifier
     """ Description
 
@@ -176,41 +176,69 @@ def Best_DT(train, val):
     -------
     """
 
+    #Default hyperparameters (obtained with gridsearch)
+    default_optimal_param_ds1 = {'criterion': 'gini',
+                                 'max_depth': 24,
+                                 'min_impurity_decrease': 0,
+                                 'min_samples_split': 2}
+    default_optimal_param_ds2 = {'criterion': 'entropy',
+                                'max_depth': 13,
+                                'min_impurity_decrease': 0.01,
+                                'min_samples_split': 2}
     # Unpack datasets
     df1_train, df2_train = train
     df1_val, df2_val = val
 
-    # Define Model
-    Best_Decision_tree=DecisionTreeClassifier()
-    param_grid={'criterion':['gini'],'max_depth':[26,27,28],'min_samples_split':[5],'min_impurity_decrease':[0,0.001],'class_weight':[None]}
-     # Apply model to dataset1
-    grid_search=GridSearchCV(Best_Decision_tree,param_grid,cv=16,return_train_score=True)
-    # Get predictions and true labels of dataset1
+    # Get X,Y for DS1
     X = df1_train[df1_train.columns[:-1]]
     Y = df1_train[df1_train.columns[-1]]
-    grid_search.fit(X,Y)
-    final_model=grid_search.best_estimator_
-    print(grid_search.best_estimator_)
-    y_pred = final_model.predict(np.array(df1_val)[:, :1024])
+    # Define Model
+    if use_default_param:
+        best_decision_tree = DecisionTreeClassifier(criterion=default_optimal_param_ds1['criterion'],
+                                                    max_depth=default_optimal_param_ds1['max_depth'],
+                                                    min_impurity_decrease=default_optimal_param_ds1['min_impurity_decrease'],
+                                                    min_samples_split=default_optimal_param_ds1['min_samples_split'])
+    else:
+        best_decision_tree = DecisionTreeClassifier()
+        param_grid={'criterion':['gini','entropy'],'max_depth':[24,25,26,27,28],'min_samples_split':[2,3,4,5],'min_impurity_decrease':[0,0.001],'class_weight':[None]}
+        # Apply Gridsearch parameters
+        grid_search=GridSearchCV(best_decision_tree,param_grid,cv=16,return_train_score=True)
+        # Get predictions and true labels of dataset1
+        grid_search.fit(X,Y)
+        best_decision_tree = grid_search.best_estimator_
+
+    best_decision_tree.fit(X,Y)
+    y_pred = best_decision_tree.predict(np.array(df1_val)[:, :1024])
     y_true = df1_val[df1_val.columns[-1]]
     # Output predictions and metrics of dataset1 to CSV
     output_metrics_and_csv(y_pred, y_true,'Best-DT',1)
 
-    # Define X,Y for dataset 2
+    # Get X,Y for DS2
     X = df2_train[df2_train.columns[:-1]]
     Y = df2_train[df2_train.columns[-1]]
-    param_grid={'criterion':['gini','entropy'],'max_depth':[5,10],'min_samples_split':[2,3,5],'min_impurity_decrease':[0.5,1],'class_weight':[None,'balanced']}
-    # Gridsearch hyperparameters
-    grid_search=GridSearchCV(Best_Decision_tree,param_grid,cv=10,return_train_score=True)
-    grid_search.fit(X,Y)
-    final_model=grid_search.best_estimator_
-    print(grid_search.best_estimator_)
-    # Get predictions and true labels of dataset2
-    y_pred = final_model.predict(np.array(df2_val)[:, :1024])
+
+    # Define Model
+    if use_default_param:
+        best_decision_tree = DecisionTreeClassifier(criterion=default_optimal_param_ds2['criterion'],
+                                                    max_depth=default_optimal_param_ds2['max_depth'],
+                                                    min_impurity_decrease=default_optimal_param_ds2[
+                                                        'min_impurity_decrease'],
+                                                    min_samples_split=default_optimal_param_ds2['min_samples_split'])
+    else:
+        best_decision_tree = DecisionTreeClassifier()
+        param_grid={'criterion':['gini','entropy'],'max_depth':list(range(5,15,2)),'min_samples_split':list(range(2,8,2)),'min_impurity_decrease':[0.01,0.05,0.1,1],'class_weight':[None,'balanced']}
+        # Apply Gridsearch parameters
+        grid_search = GridSearchCV(best_decision_tree, param_grid, cv=16, return_train_score=True)
+        # Get predictions and true labels of dataset1
+        grid_search.fit(X, Y)
+        best_decision_tree = grid_search.best_estimator_
+
+    best_decision_tree.fit(X, Y)
+    y_pred = best_decision_tree.predict(np.array(df2_val)[:, :1024])
     y_true = df2_val[df2_val.columns[-1]]
+
     # Output predictions and metrics of dataset2 to CSV
-    output_metrics_and_csv(y_pred, y_true,'Best-DT',2)
-    return
+    output_metrics_and_csv(y_pred, y_true, 'Best-DT', 2)
 
 def PER(train, val):
     """ Description
@@ -345,7 +373,7 @@ def main():
     # Run models
     # GNB(df_train,df_val)
     # Base_DT(df_train,df_val)
-    # Best_DT(df_train,df_val)
+    Best_DT(df_train,df_val)
     # PER(df_train, df_val)
     # Base_MLP(df_train, df_val)
     # Best_MLP(df_train, df_val)
