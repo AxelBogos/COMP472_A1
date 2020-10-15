@@ -41,9 +41,9 @@ where the plot function and each model call generate their output files in the d
 │   README.md
 │
 └───results
-│   └───dataset1-plot.png
 │   │
-│   └───dataset2-plot.png
+│   │dataset1-plot.png
+│   │dataset2-plot.png
 │   │
 │   └───GNB-DS1
 |   |   |GNB-DS1.csv
