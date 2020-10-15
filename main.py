@@ -33,17 +33,18 @@ def plot_data(data):
     -------
     """
     df1, df2 = data
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(18, 12))
     ax = sns.countplot(df1[df1.columns[-1]].map(LATIN_ALPHABET), order=LATIN_ALPHABET.values(), palette='colorblind')
-    ax.set(xlabel='Letters', ylabel='Count', title='Count Of Letters In Dataset 1')
+    ax.set(xlabel='Letters', ylabel='Count', title='Distribution of Dataset 1')
     ax.axhline(df1[df1.columns[-1]].shape[0] / 26, color='red', label='Uniform Distribution')
     plt.legend()
-    plt.show()
+    plt.savefig('results/dataset1_plot.png')
+    plt.cla()
     ax = sns.countplot(df2[df2.columns[-1]].map(GREEK_ALPHABET), order=GREEK_ALPHABET.values(), palette='colorblind')
-    ax.set(xlabel='Letters', ylabel='Count', title='Count Of Letters In Dataset 2')
+    ax.set(xlabel='Letters', ylabel='Count', title='Distribution of Dataset 2')
     ax.axhline(df2[df2.columns[-1]].shape[0] / 10, color='red', label='Uniform Distribution')
     plt.legend()
-    plt.show()
+    plt.savefig('results/dataset2_plot.png')
 
 def plot_confusion_matrix(y_pred,y_true,dataset_id):
     if(dataset_id==1):
@@ -363,11 +364,11 @@ def main():
     plot_data(df_train)
 
     # Run models
-    Best_DT(df_train,df_val)
-    GNB(df_train,df_val)
-    PER(df_train, df_val)
-    Base_MLP(df_train, df_val)
-    Best_MLP(df_train, df_val)
+    # Best_DT(df_train,df_val)
+    # GNB(df_train,df_val)
+    # PER(df_train, df_val)
+    # Base_MLP(df_train, df_val)
+    # Best_MLP(df_train, df_val)
     return
 
 
