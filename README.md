@@ -33,7 +33,7 @@ Execute the main() function of ```main.py```. This will execute the following fu
     Base_MLP(df_train, df_val)
     Best_MLP(df_train, df_val)
 ```
-2 plots *dataset#_plot.png* of the overall dataset distribution are also generated in the root result directory.
+2 plots *dataset#_plot.png* of the overall dataset distribution are also generated in the root *result* directory.
 
 For every model/dataset pair, the following are generated: 
 1.  A *model-name_dataset#*.csv formatted as such in that order
