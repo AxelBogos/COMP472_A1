@@ -222,25 +222,31 @@ def PER(train, val):
     Returns
     -------
     """
-
+    from sklearn.linear_model import Perceptron
     # Unpack datasets
     df1_train, df2_train = train
     df1_val, df2_val = val
 
     # Define Model
-
+    per = Perceptron()
     # Apply model to dataset1
-
+    X = df1_train[df1_train.columns[:-1]]
+    y = df1_train[df1_train.columns[-1]]
+    per.fit(X,y)
     # Get predictions and true labels of dataset1
-
+    pred = per.predict(np.array(df1_val)[:, :1024])
+    true = df1_val[df1_val.columns[-1]]
     # Output predictions and metrics of dataset1 to CSV
-
+    output_metrics_and_csv(pred, true, "Perceptron", 1)
     # Apply model to dataset2
-
+    X = df2_train[df2_train.columns[:-1]]
+    y = df2_train[df2_train.columns[-1]]
+    per.fit(X,y)
     # Get predictions and true labels of dataset2
-
+    pred = per.predict(np.array(df2_val)[:, :1024])
+    true = df2_val[df2_val.columns[-1]]
     # Output predictions and metrics of dataset2 to CSV
-
+    output_metrics_and_csv(pred, true, "Perceptron", 2)
     return
 
 
@@ -254,28 +260,35 @@ def Base_MLP(train, val):
     Returns
     -------
     """
-
+    from sklearn.neural_network import MLPClassifier
     # Unpack datasets
     df1_train, df2_train = train
     df1_val, df2_val = val
 
     # Define Model
-
+    mlp=MLPClassifier(hidden_layer_sizes=(100,),activation="logistic",solver="sgd")
     # Apply model to dataset1
-
+    X = df1_train[df1_train.columns[:-1]]
+    y = df1_train[df1_train.columns[-1]]
+    mlp.fit(X,y)
     # Get predictions and true labels of dataset1
-
+    pred = mlp.predict(np.array(df1_val)[:, :1024])
+    true = df1_val[df1_val.columns[-1]]
     # Output predictions and metrics of dataset1 to CSV
-
+    output_metrics_and_csv(pred, true, "Base-MLP", 1)
     # Apply model to dataset2
-
+    X = df2_train[df2_train.columns[:-1]]
+    y = df2_train[df2_train.columns[-1]]
+    mlp.fit(X,y)
     # Get predictions and true labels of dataset2
-
+    pred = mlp.predict(np.array(df2_val)[:, :1024])
+    true = df2_val[df2_val.columns[-1]]
     # Output predictions and metrics of dataset2 to CSV
-
+    output_metrics_and_csv(pred, true, "Base-MLP", 2)
     return
 
 def Best_MLP(train, val):
+    from sklearn.neural_network import MLPClassifier
     """ Description
 
     Parameters
@@ -291,18 +304,32 @@ def Best_MLP(train, val):
     df1_val, df2_val = val
 
     # Define Model
-
-    # Apply model to dataset1
+    mlp=MLPClassifier()
+    param_grid={'activation':['identity','logistic','tanh','relu'],'hidden_layer_sizes':[(50,30),(20,10,10)],'solver':["adam","sgd"]}   
+     # Apply model to dataset1
+    grid_search=GridSearchCV(mlp,param_grid,cv=16,return_train_score=True)
+    X = df1_train[df1_train.columns[:-1]]
+    y = df1_train[df1_train.columns[-1]]
+    grid_search.fit(X,y)
+    final_model=grid_search.best_estimator_
+    print(grid_search.best_estimator_)
 
     # Get predictions and true labels of dataset1
-
-    # Output predictions and metrics of dataset2 to CSV
-
+    pred = final_model.predict(np.array(df1_val)[:, :1024])
+    true = df1_val[df1_val.columns[-1]]
+    # Output predictions and metrics of dataset1 to CSV
+    output_metrics_and_csv(pred, true, "Base-MLP", 1)
     # Apply model to dataset2
-
+    X = df2_train[df2_train.columns[:-1]]
+    y = df2_train[df2_train.columns[-1]]
+    grid_search.fit(X,y)
+    final_model=grid_search.best_estimator_
+    print(grid_search.best_estimator_)
     # Get predictions and true labels of dataset2
-
+    pred = final_model.predict(np.array(df2_val)[:, :1024])
+    true = df2_val[df2_val.columns[-1]]
     # Output predictions and metrics of dataset2 to CSV
+    output_metrics_and_csv(pred, true, "Base-MLP", 2)
 
     return
 
@@ -317,9 +344,11 @@ def main():
     #plot_data(df_train)
 
     # Run models
+    # Best_DT(df_train,df_val)
     #GNB(df_train,df_val)
-    #Base_DT(df_train, df_val)
-    Best_DT(df_train, df_val)
+    # PER(df_train, df_val)
+    Base_MLP(df_train, df_val)
+    # Best_MLP(df_train, df_val)
     return
 
 
