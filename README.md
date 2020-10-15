@@ -33,7 +33,7 @@ Execute the main() function of ```main.py```. This will execute the following fu
     Base_MLP(df_train, df_val)
     Best_MLP(df_train, df_val)
 ```
-where each the plot function and each model call generate the output files in directory 'results' with the following structure
+where the plot function and each model call generate their output files in the directory 'results' with the following structure
 ```
 .
 │   main.py
