@@ -249,7 +249,6 @@ def PER(train, val):
     output_metrics_and_csv(pred, true, "Perceptron", 2)
     return
 
-
 def Base_MLP(train, val):
     """ Description
 
@@ -344,10 +343,11 @@ def main():
     #plot_data(df_train)
 
     # Run models
+    # GNB(df_train,df_val)
+    # Base_DT(df_train,df_val)
     # Best_DT(df_train,df_val)
-    #GNB(df_train,df_val)
     # PER(df_train, df_val)
-    Base_MLP(df_train, df_val)
+    # Base_MLP(df_train, df_val)
     # Best_MLP(df_train, df_val)
     return
 
