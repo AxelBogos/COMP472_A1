@@ -11,7 +11,6 @@ Xavier Morin - 40077865
 
 ## Preliminary Information
 
----
 #### Libraries Used:
 * pandas
 * seaborn
