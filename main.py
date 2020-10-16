@@ -4,14 +4,15 @@ import seaborn as sns
 sns.set_style("darkgrid")
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 # Sklearn imports. Uncomment as you need, it gets long to run otherwise
 from sklearn.metrics import precision_recall_fscore_support,confusion_matrix,accuracy_score  # f1 by default
-#from sklearn.naive_bayes import GaussianNB
-
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
-# from sklearn.linear_model import Perceptron
-# from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import Perceptron
+from sklearn.neural_network import MLPClassifier
 
 # Constant alphabet maps
 LATIN_ALPHABET = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I', 9: 'J', 10: 'K', 11: 'L',
@@ -32,17 +33,18 @@ def plot_data(data):
     -------
     """
     df1, df2 = data
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(18, 12))
     ax = sns.countplot(df1[df1.columns[-1]].map(LATIN_ALPHABET), order=LATIN_ALPHABET.values(), palette='colorblind')
-    ax.set(xlabel='Letters', ylabel='Count', title='Count Of Letters In Dataset 1')
+    ax.set(xlabel='Letters', ylabel='Count', title='Distribution of Dataset 1')
     ax.axhline(df1[df1.columns[-1]].shape[0] / 26, color='red', label='Uniform Distribution')
     plt.legend()
-    plt.show()
+    plt.savefig('results/dataset1_plot.png')
+    plt.cla()
     ax = sns.countplot(df2[df2.columns[-1]].map(GREEK_ALPHABET), order=GREEK_ALPHABET.values(), palette='colorblind')
-    ax.set(xlabel='Letters', ylabel='Count', title='Count Of Letters In Dataset 2')
+    ax.set(xlabel='Letters', ylabel='Count', title='Distribution of Dataset 2')
     ax.axhline(df2[df2.columns[-1]].shape[0] / 10, color='red', label='Uniform Distribution')
     plt.legend()
-    plt.show()
+    plt.savefig('results/dataset2_plot.png')
 
 def plot_confusion_matrix(y_pred,y_true,dataset_id):
     if(dataset_id==1):
@@ -79,30 +81,34 @@ def output_metrics_and_csv(y_pred,y_true,model_name,dataset_id):
     -------
     """
 
-    # Get metrics TODO Clarify which are pertinent
+    # Get metrics
     accuracy=accuracy_score(y_true,y_pred)
     precision_per_class, recall_per_class, f1_per_class,  support_per_class= precision_recall_fscore_support(y_true, y_pred)
     precision_weighted, recall_weighted, f1_weighted,support_weighted = precision_recall_fscore_support(y_true, y_pred, average='weighted')
     precision_macro, recall_macro, f1_macro,support_macro = precision_recall_fscore_support(y_true, y_pred,average='macro')
 
-    # Prepare Result
-    # TODO Confusion matrix is included in output csv? Formatting of metrics in output file?
-    conf_mx=confusion_matrix(y_true,y_pred)
     #Output to CSV
-    predicted=[np.sum(y_pred==i) for i in range(conf_mx.shape[0])]
-    output_acc=zip([round(accuracy,2)],[round(f1_weighted,2)],[round(f1_macro,2)])
-    output_pred = zip(np.arange(y_pred.shape[0]), predicted,np.round(precision_per_class,2),np.round(recall_per_class,2),np.round(f1_per_class,2))  # In format (y_instance,prediction)
-    df_0=pd.DataFrame(output_acc)
-    df_0.to_csv('results/%s-DS%d.csv' % (model_name, dataset_id), index=False, header=[ 'Accuracy','F1_weighted','F1_macro'])    
-    df_1=pd.DataFrame(output_pred)
-    df_1.to_csv('results/%s-DS%d.csv' % (model_name, dataset_id), index=False, mode='a',header=[ 'Instance','Predicted','Precision','Recall','F1'])
-    df_2=pd.DataFrame(conf_mx,columns=np.arange(conf_mx.shape[1]))
-    df_2.to_csv('results/%s-DS%d.csv' % (model_name, dataset_id), header=True, mode='a')
-   
-    return
+    instance_prediction=zip(range(y_pred.shape[0]),y_pred)
+    class_metrics = zip(np.arange(y_pred.shape[0]), np.round(precision_per_class, 2),
+                      np.round(recall_per_class, 2), np.round(f1_per_class, 2))
+    model_metrics = zip([round(accuracy, 2)], [round(f1_weighted, 2)], [round(f1_macro, 2)])
+    #Get directory and file name.
+    model_name_dataset_id = '%s-DS%d' % (model_name, dataset_id)
+    outdir = '%s/%s' % ('results',model_name_dataset_id)
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    df_0=pd.DataFrame(instance_prediction)
+    df_0.to_csv('%s/%s.csv' % (outdir, model_name_dataset_id), index=False, header=['Instance','Predicted Class'])
+    df_1=pd.DataFrame(class_metrics)
+    df_1.to_csv('%s/%s.csv' % (outdir, model_name_dataset_id), index=False, mode='a',header=[ 'Class','Precision','Recall','F1'])
+    df_2 = pd.DataFrame(model_metrics)
+    df_2.to_csv('%s/%s.csv' % (outdir, model_name_dataset_id), index=False, mode='a', header=['Accuracy', 'Macro-F1', 'Weighted-F1'])
+
+    #Output confusion matrix
+    conf_mx = plot_confusion_matrix(y_pred,y_true,dataset_id)
+    conf_mx.figure.savefig('%s/%s-Confusion-Matrix.png' % (outdir, model_name_dataset_id))
 
 def GNB(train, val):
-    from sklearn.naive_bayes import GaussianNB
     """ Description
     
     Parameters
@@ -146,7 +152,6 @@ def GNB(train, val):
     output_metrics_and_csv(y_pred, y_true,'GNB',2)
 
 def Base_DT(train, val):
-    from sklearn.tree import DecisionTreeClassifier
     """ Description
 
     Parameters
@@ -183,8 +188,10 @@ def Base_DT(train, val):
     output_metrics_and_csv(y_pred, y_true,'Base-DT',2)
 
 
+
 def Best_DT(train, val,use_default_param=True):
     from sklearn.tree import DecisionTreeClassifier
+
     """ Description
 
     Parameters
@@ -270,7 +277,6 @@ def PER(train, val):
     Returns
     -------
     """
-    from sklearn.linear_model import Perceptron
     # Unpack datasets
     df1_train, df2_train = train
     df1_val, df2_val = val
@@ -307,7 +313,6 @@ def Base_MLP(train, val):
     Returns
     -------
     """
-    from sklearn.neural_network import MLPClassifier
     # Unpack datasets
     df1_train, df2_train = train
     df1_val, df2_val = val
@@ -335,7 +340,6 @@ def Base_MLP(train, val):
     return
 
 def Best_MLP(train, val):
-    from sklearn.neural_network import MLPClassifier
     """ Description
 
     Parameters
@@ -388,12 +392,14 @@ def main():
     df_val = (pd.read_csv('data/val_1.csv'), pd.read_csv('data/val_2.csv'))
 
     # Plot instance distribution
-    #plot_data(df_train)
+    plot_data(df_train)
 
     # Run models
+
+    # Best_DT(df_train,df_val)
     # GNB(df_train,df_val)
-    # Base_DT(df_train,df_val)
-    Best_DT(df_train,df_val)
+
+
     # PER(df_train, df_val)
     # Base_MLP(df_train, df_val)
     # Best_MLP(df_train, df_val)
