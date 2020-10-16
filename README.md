@@ -1,5 +1,6 @@
 # :beers: COMP 472 – Assignment 1 :tiger:
 
+[Repo URL](https://github.com/AxelBogos/COMP472_A1)
 ---
 
 Axel Bogos - 40077502 <br>
