@@ -1,5 +1,6 @@
 # :beers: COMP 472 – Assignment 1 :tiger:
 
+[Repo URL](https://github.com/AxelBogos/COMP472_A1)
 ---
 
 Axel Bogos - 40077502 <br>
@@ -10,7 +11,6 @@ Xavier Morin - 40077865
 
 ## Preliminary Information
 
----
 #### Libraries Used:
 * pandas
 * seaborn
@@ -33,7 +33,17 @@ Execute the main() function of ```main.py```. This will execute the following fu
     Base_MLP(df_train, df_val)
     Best_MLP(df_train, df_val)
 ```
-where the plot function and each model call generate their output files in the directory 'results' with the following structure
+2 plots *dataset#_plot.png* of the overall dataset distribution are also generated in the root *result* directory.
+
+For every model/dataset pair, the following are generated: 
+1.  A *model-name_dataset#*.csv formatted as such in that order
+    * 1 ```Instance,Predicted``` line per instance of test dataset
+    * 1 ```Precision,Recall, F-1``` line per class of test dataset
+    * 1 ```Accuracy, Macro F-1, Weighted F-1``` line.
+    
+2. A *model-name-dataset#_Confusion_Matrix*.png file of the confusion matrix plot. 
+
+These files are organized in a directory structure as follows: 
 ```
 .
 │ main.py
