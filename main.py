@@ -328,7 +328,7 @@ def Base_MLP(train, val):
     df1_val, df2_val = val
 
     # Define Model
-    mlp=MLPClassifier(hidden_layer_sizes=(100,), activation="logistic", solver="sgd", max_iter=500)
+    mlp=MLPClassifier(hidden_layer_sizes=(100,), activation="logistic", solver="sgd", max_iter=750)
     # Apply model to dataset1
     X = df1_train[df1_train.columns[:-1]]
     y = df1_train[df1_train.columns[-1]]
@@ -418,7 +418,7 @@ def Best_MLP(train, val, use_default_param=True):
         grid_search.fit(X,Y)
         mlp = grid_search.best_estimator_
     mlp.fit(X,Y)
-    y_pred = mlp.predict(np.array(df1_val)[:, :1024])
+    y_pred = mlp.predict(np.array(df2_val)[:, :1024])
     y_true = df2_val[df2_val.columns[-1]]
     # Output predictions and metrics of dataset1 to CSV
     output_metrics_and_csv(y_pred, y_true, 'Best-MLP', 2)
@@ -437,11 +437,17 @@ def main():
 
     # Run models
     GNB(df_train,df_tests_with_label)
+    print('GNB Done!')
     Base_DT(df_train, df_tests_with_label)
+    print('Base-DT Done!')
     Best_DT(df_train, df_tests_with_label)
+    print('Best-DT Done!')
     PER(df_train, df_tests_with_label)
+    print('PER Done!')
     Base_MLP(df_train, df_tests_with_label)
+    print('Base-MLP Done!')
     Best_MLP(df_train, df_tests_with_label)
+    print('Best-MLP Done!')
 
 if __name__ == '__main__':
     main()
