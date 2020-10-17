@@ -362,11 +362,11 @@ def Best_MLP(train, val, use_default_param=True):
     #Default hyperparameters (obtained with gridsearch)
     default_optimal_param_ds1 = {'activation': 'identity',
                                 'hidden_layer_sizes': (30, 50),
-                                'max_iter': 1000,
+                                'max_iter': 750,
                                 'solver': 'adam'}
     default_optimal_param_ds2 = {'activation': 'tanh',
                                 'hidden_layer_sizes': (30, 50),
-                                'max_iter': 1000,
+                                'max_iter': 750,
                                 'solver': 'sgd'}
 
     # Unpack datasets
@@ -451,7 +451,7 @@ def main():
     Best_MLP(df_train, df_tests_with_label)
     print('Best-MLP Done! Time: ' + str(timer()-start))
     end = timer()
-    print('Total time: '+end - start)
+    print('Total time: '+str(end - start))
 
 if __name__ == '__main__':
     main()
