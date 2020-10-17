@@ -424,6 +424,7 @@ def Best_MLP(train, val, use_default_param=True):
     output_metrics_and_csv(y_pred, y_true, 'Best-MLP', 2)
 
 def main():
+    from timeit import default_timer as timer
     # Load datasets splits as tuples of each type
     df_train = (pd.read_csv('data/train_1.csv'), pd.read_csv('data/train_2.csv'))
     df_tests_no_label = (pd.read_csv('data/test_no_label_1.csv'), pd.read_csv('data/test_no_label_2.csv'))
@@ -435,19 +436,22 @@ def main():
     plot_data(df_tests_with_label, 'test')
     plot_data(df_val, 'val')
 
+    start = timer()
     # Run models
     GNB(df_train,df_tests_with_label)
-    print('GNB Done!')
+    print('GNB Done! Time: ' + str(timer()-start))
     Base_DT(df_train, df_tests_with_label)
-    print('Base-DT Done!')
+    print('Base-DT Done! Time: ' + str(timer()-start))
     Best_DT(df_train, df_tests_with_label)
-    print('Best-DT Done!')
+    print('Best-DT Done! Time: ' + str(timer()-start))
     PER(df_train, df_tests_with_label)
-    print('PER Done!')
+    print('PER Done! Time: ' + str(timer()-start))
     Base_MLP(df_train, df_tests_with_label)
-    print('Base-MLP Done!')
+    print('Base-MLP Done! Time: ' + str(timer()-start))
     Best_MLP(df_train, df_tests_with_label)
-    print('Best-MLP Done!')
+    print('Best-MLP Done! Time: ' + str(timer()-start))
+    end = timer()
+    print('Total time: '+end - start)
 
 if __name__ == '__main__':
     main()
