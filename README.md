@@ -33,15 +33,18 @@ Execute the main() function of ```main.py```. This will execute the following fu
     Base_MLP(df_train, df_val)
     Best_MLP(df_train, df_val)
 ```
-2 plots *dataset#_plot.png* of the overall dataset distribution are also generated in the root *result* directory.
+The following are generated in the *result* directory: 
 
-For every model/dataset pair, the following are generated: 
-1.  A *model-name_dataset#*.csv formatted as such in that order
-    * 1 ```Instance,Predicted``` line per instance of test dataset
-    * 1 ```Precision,Recall, F-1``` line per class of test dataset
-    * 1 ```Accuracy, Macro F-1, Weighted F-1``` line.
+1. 6 plots of the train, val and test data distribution for both datasets named *{train,val,test}dataset#_plot.png* 
+
+2. For every model/dataset pair, a directory named *model-name_dataset#* is created and the following are generated within it: 
+
+   2.1 A *model-name_dataset#*.csv formatted in that order
+      * 1 ```Instance,Predicted``` line per instance of test dataset
+      * 1 ```Precision,Recall, F-1``` line per class of test dataset
+      * 1 ```Accuracy, Macro F-1, Weighted F-1``` line.
     
-2. A *model-name-dataset#_Confusion_Matrix*.png file of the confusion matrix plot. 
+   2.2 A *model-name-dataset#_Confusion_Matrix*.png file of the confusion matrix plot. 
 
 These files are organized in a directory structure as follows: 
 ```
@@ -52,8 +55,12 @@ These files are organized in a directory structure as follows:
 │
 └───results
 │   │
-│   │ dataset1-plot.png
-│   │ dataset2-plot.png
+│   │ train1-plot.png
+│   │ train2-plot.png
+│   │ val1-plot.png
+│   │ val2-plot.png
+│   │ test1-plot.png
+│   │ test2-plot.png
 │   │
 │   └───GNB-DS1
 |   |   | GNB-DS1.csv
