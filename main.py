@@ -21,7 +21,7 @@ LATIN_ALPHABET = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H'
 GREEK_ALPHABET = {0: '\u03C0', 1: '\u03B1', 2: '\u03B2', 3: '\u03C3', 4: '\u03B3', 5: '\u03B4', 6: '\u03BB',
                   7: '\u03C9', 8: '\u03BC', 9: '\u03BE'}
 
-def plot_data(data):
+def plot_data(data,dataset_name):
     """ Description
 
     Parameters
@@ -35,16 +35,20 @@ def plot_data(data):
     df1, df2 = data
     plt.figure(figsize=(18, 12))
     ax = sns.countplot(df1[df1.columns[-1]].map(LATIN_ALPHABET), order=LATIN_ALPHABET.values(), palette='colorblind')
-    ax.set(xlabel='Letters', ylabel='Count', title='Distribution of Dataset 1')
+    plt.title('Distribution of '+dataset_name+' dataset1', fontsize=25)
+    plt.xlabel('Class',fontsize=20)
+    plt.ylabel('Count', fontsize=20)
     ax.axhline(df1[df1.columns[-1]].shape[0] / 26, color='red', label='Uniform Distribution')
     plt.legend()
-    plt.savefig('results/dataset1_plot.png')
+    plt.savefig('results/'+dataset_name+'1_plot.png')
     plt.cla()
     ax = sns.countplot(df2[df2.columns[-1]].map(GREEK_ALPHABET), order=GREEK_ALPHABET.values(), palette='colorblind')
-    ax.set(xlabel='Letters', ylabel='Count', title='Distribution of Dataset 2')
+    plt.title('Distribution of '+dataset_name+' dataset2', fontsize=25)
+    plt.xlabel('Class',fontsize=20)
+    plt.ylabel('Count', fontsize=20)
     ax.axhline(df2[df2.columns[-1]].shape[0] / 10, color='red', label='Uniform Distribution')
     plt.legend()
-    plt.savefig('results/dataset2_plot.png')
+    plt.savefig('results/'+dataset_name+'2_plot.png')
 
 def plot_confusion_matrix(y_pred,y_true,dataset_id):
     if(dataset_id==1):
@@ -187,8 +191,6 @@ def Base_DT(train, val):
     # Output predictions and metrics of dataset2 to CSV
     output_metrics_and_csv(y_pred, y_true,'Base-DT',2)
 
-
-
 def Best_DT(train, val,use_default_param=True):
     from sklearn.tree import DecisionTreeClassifier
 
@@ -207,10 +209,11 @@ def Best_DT(train, val,use_default_param=True):
                                  'max_depth': 24,
                                  'min_impurity_decrease': 0,
                                  'min_samples_split': 2}
-    default_optimal_param_ds2 = {'criterion': 'entropy',
-                                'max_depth': 13,
-                                'min_impurity_decrease': 0.01,
-                                'min_samples_split': 2}
+    default_optimal_param_ds2 = {'class_weight': None,
+                                'criterion': 'gini',
+                                'max_depth': 24,
+                                'min_impurity_decrease': 0.001,
+                                'min_samples_split': 6}
     # Unpack datasets
     df1_train, df2_train = train
     df1_val, df2_val = val
@@ -226,9 +229,13 @@ def Best_DT(train, val,use_default_param=True):
                                                     min_samples_split=default_optimal_param_ds1['min_samples_split'])
     else:
         best_decision_tree = DecisionTreeClassifier()
-        param_grid={'criterion':['gini','entropy'],'max_depth':[24,25,26,27,28],'min_samples_split':[2,3,4,5],'min_impurity_decrease':[0,0.001],'class_weight':[None]}
+        param_grid = {'criterion': ['gini', 'entropy'],
+                      'max_depth': list(range(10, 50, 2)),
+                      'min_samples_split': list(range(2, 10, 2)),
+                      'min_impurity_decrease': [0, 0.001, 0.01],
+                      'class_weight': [None, 'balanced']}
         # Apply Gridsearch parameters
-        grid_search=GridSearchCV(best_decision_tree,param_grid,cv=16,return_train_score=True)
+        grid_search=GridSearchCV(best_decision_tree, param_grid, return_train_score=True)
         # Get predictions and true labels of dataset1
         grid_search.fit(X,Y)
         best_decision_tree = grid_search.best_estimator_
@@ -252,9 +259,13 @@ def Best_DT(train, val,use_default_param=True):
                                                     min_samples_split=default_optimal_param_ds2['min_samples_split'])
     else:
         best_decision_tree = DecisionTreeClassifier()
-        param_grid={'criterion':['gini','entropy'],'max_depth':list(range(5,15,2)),'min_samples_split':list(range(2,8,2)),'min_impurity_decrease':[0.01,0.05,0.1,1],'class_weight':[None,'balanced']}
+        param_grid = {'criterion': ['gini', 'entropy'],
+                      'max_depth': list(range(10, 50, 2)),
+                      'min_samples_split': list(range(2, 10, 2)),
+                      'min_impurity_decrease': [0, 0.001, 0.01],
+                      'class_weight': [None, 'balanced']}
         # Apply Gridsearch parameters
-        grid_search = GridSearchCV(best_decision_tree, param_grid, cv=16, return_train_score=True)
+        grid_search = GridSearchCV(best_decision_tree, param_grid, return_train_score=True)
         # Get predictions and true labels of dataset1
         grid_search.fit(X, Y)
         best_decision_tree = grid_search.best_estimator_
@@ -288,20 +299,19 @@ def PER(train, val):
     y = df1_train[df1_train.columns[-1]]
     per.fit(X,y)
     # Get predictions and true labels of dataset1
-    pred = per.predict(np.array(df1_val)[:, :1024])
-    true = df1_val[df1_val.columns[-1]]
+    y_pred = per.predict(np.array(df1_val)[:, :1024])
+    y_true = df1_val[df1_val.columns[-1]]
     # Output predictions and metrics of dataset1 to CSV
-    output_metrics_and_csv(pred, true, "Perceptron", 1)
+    output_metrics_and_csv(y_pred, y_true, "Perceptron", 1)
     # Apply model to dataset2
     X = df2_train[df2_train.columns[:-1]]
     y = df2_train[df2_train.columns[-1]]
     per.fit(X,y)
     # Get predictions and true labels of dataset2
-    pred = per.predict(np.array(df2_val)[:, :1024])
-    true = df2_val[df2_val.columns[-1]]
+    y_pred = per.predict(np.array(df2_val)[:, :1024])
+    y_true = df2_val[df2_val.columns[-1]]
     # Output predictions and metrics of dataset2 to CSV
-    output_metrics_and_csv(pred, true, "Perceptron", 2)
-    return
+    output_metrics_and_csv(y_pred, y_true, "Perceptron", 2)
 
 def Base_MLP(train, val):
     """ Description
@@ -318,28 +328,28 @@ def Base_MLP(train, val):
     df1_val, df2_val = val
 
     # Define Model
-    mlp=MLPClassifier(hidden_layer_sizes=(100,),activation="logistic",solver="sgd")
+    mlp=MLPClassifier(hidden_layer_sizes=(100,), activation="logistic", solver="sgd", max_iter=750)
     # Apply model to dataset1
     X = df1_train[df1_train.columns[:-1]]
     y = df1_train[df1_train.columns[-1]]
     mlp.fit(X,y)
     # Get predictions and true labels of dataset1
-    pred = mlp.predict(np.array(df1_val)[:, :1024])
-    true = df1_val[df1_val.columns[-1]]
+    y_pred = mlp.predict(np.array(df1_val)[:, :1024])
+    y_true = df1_val[df1_val.columns[-1]]
     # Output predictions and metrics of dataset1 to CSV
-    output_metrics_and_csv(pred, true, "Base-MLP", 1)
+    output_metrics_and_csv(y_pred, y_true, "Base-MLP", 1)
+
     # Apply model to dataset2
     X = df2_train[df2_train.columns[:-1]]
     y = df2_train[df2_train.columns[-1]]
     mlp.fit(X,y)
     # Get predictions and true labels of dataset2
-    pred = mlp.predict(np.array(df2_val)[:, :1024])
-    true = df2_val[df2_val.columns[-1]]
+    y_pred = mlp.predict(np.array(df2_val)[:, :1024])
+    y_true = df2_val[df2_val.columns[-1]]
     # Output predictions and metrics of dataset2 to CSV
-    output_metrics_and_csv(pred, true, "Base-MLP", 2)
-    return
+    output_metrics_and_csv(y_pred, y_true, "Base-MLP", 2)
 
-def Best_MLP(train, val):
+def Best_MLP(train, val, use_default_param=True):
     """ Description
 
     Parameters
@@ -349,42 +359,72 @@ def Best_MLP(train, val):
     Returns
     -------
     """
+    #Default hyperparameters (obtained with gridsearch)
+    default_optimal_param_ds1 = {'activation': 'identity',
+                                'hidden_layer_sizes': (30, 50),
+                                'max_iter': 1000,
+                                'solver': 'adam'}
+    default_optimal_param_ds2 = {'activation': 'tanh',
+                                'hidden_layer_sizes': (30, 50),
+                                'max_iter': 1000,
+                                'solver': 'sgd'}
 
     # Unpack datasets
     df1_train, df2_train = train
     df1_val, df2_val = val
 
-    # Define Model
-    mlp=MLPClassifier()
-    param_grid={'activation':['identity','logistic','tanh','relu'],'hidden_layer_sizes':[(50,30),(20,10,10)],'solver':["adam","sgd"]}   
-     # Apply model to dataset1
-    grid_search=GridSearchCV(mlp,param_grid,cv=16,return_train_score=True)
+    # Get X,Y for DS1
     X = df1_train[df1_train.columns[:-1]]
-    y = df1_train[df1_train.columns[-1]]
-    grid_search.fit(X,y)
-    final_model=grid_search.best_estimator_
-    print(grid_search.best_estimator_)
-
-    # Get predictions and true labels of dataset1
-    pred = final_model.predict(np.array(df1_val)[:, :1024])
-    true = df1_val[df1_val.columns[-1]]
+    Y = df1_train[df1_train.columns[-1]]
+    # Define Model
+    if use_default_param:
+        mlp = MLPClassifier(activation=default_optimal_param_ds1['activation'],
+                            hidden_layer_sizes=default_optimal_param_ds1['hidden_layer_sizes'],
+                            max_iter=default_optimal_param_ds1['max_iter'],
+                            solver=default_optimal_param_ds1['solver'])
+    else:
+        mlp = MLPClassifier()
+        param_grid = {'activation': ['identity', 'logistic', 'tanh', 'relu'],
+                      'hidden_layer_sizes': [(30, 50), (10, 10, 10)],
+                      'solver': ["adam", "sgd"]}
+        # Apply Gridsearch parameters
+        grid_search=GridSearchCV(mlp, param_grid, return_train_score=True)
+        # Get predictions and true labels of dataset1
+        grid_search.fit(X,Y)
+        mlp = grid_search.best_estimator_
+    mlp.fit(X,Y)
+    y_pred = mlp.predict(np.array(df1_val)[:, :1024])
+    y_true = df1_val[df1_val.columns[-1]]
     # Output predictions and metrics of dataset1 to CSV
-    output_metrics_and_csv(pred, true, "Base-MLP", 1)
-    # Apply model to dataset2
-    X = df2_train[df2_train.columns[:-1]]
-    y = df2_train[df2_train.columns[-1]]
-    grid_search.fit(X,y)
-    final_model=grid_search.best_estimator_
-    print(grid_search.best_estimator_)
-    # Get predictions and true labels of dataset2
-    pred = final_model.predict(np.array(df2_val)[:, :1024])
-    true = df2_val[df2_val.columns[-1]]
-    # Output predictions and metrics of dataset2 to CSV
-    output_metrics_and_csv(pred, true, "Base-MLP", 2)
+    output_metrics_and_csv(y_pred, y_true, 'Best-MLP', 1)
 
-    return
+    # Get X,Y for DS2
+    X = df2_train[df2_train.columns[:-1]]
+    Y = df2_train[df2_train.columns[-1]]
+    # Define Model
+    if use_default_param:
+        mlp = MLPClassifier(activation=default_optimal_param_ds2['activation'],
+                            hidden_layer_sizes=default_optimal_param_ds2['hidden_layer_sizes'],
+                            max_iter=default_optimal_param_ds2['max_iter'],
+                            solver=default_optimal_param_ds2['solver'])
+    else:
+        mlp = MLPClassifier()
+        param_grid = {'activation': ['identity', 'logistic', 'tanh', 'relu'],
+                      'hidden_layer_sizes': [(30, 50), (10, 10, 10)],
+                      'solver': ["adam", "sgd"]}
+        # Apply Gridsearch parameters
+        grid_search=GridSearchCV(mlp, param_grid, return_train_score=True)
+        # Get predictions and true labels of dataset1
+        grid_search.fit(X,Y)
+        mlp = grid_search.best_estimator_
+    mlp.fit(X,Y)
+    y_pred = mlp.predict(np.array(df2_val)[:, :1024])
+    y_true = df2_val[df2_val.columns[-1]]
+    # Output predictions and metrics of dataset1 to CSV
+    output_metrics_and_csv(y_pred, y_true, 'Best-MLP', 2)
 
 def main():
+    from timeit import default_timer as timer
     # Load datasets splits as tuples of each type
     df_train = (pd.read_csv('data/train_1.csv'), pd.read_csv('data/train_2.csv'))
     df_tests_no_label = (pd.read_csv('data/test_no_label_1.csv'), pd.read_csv('data/test_no_label_2.csv'))
@@ -392,19 +432,26 @@ def main():
     df_val = (pd.read_csv('data/val_1.csv'), pd.read_csv('data/val_2.csv'))
 
     # Plot instance distribution
-    plot_data(df_train)
+    plot_data(df_train,'train')
+    plot_data(df_tests_with_label, 'test')
+    plot_data(df_val, 'val')
 
+    start = timer()
     # Run models
-
-    # Best_DT(df_train,df_val)
-    # GNB(df_train,df_val)
-
-
-    # PER(df_train, df_val)
-    # Base_MLP(df_train, df_val)
-    # Best_MLP(df_train, df_val)
-    return
-
+    GNB(df_train,df_tests_with_label)
+    print('GNB Done! Time: ' + str(timer()-start))
+    Base_DT(df_train, df_tests_with_label)
+    print('Base-DT Done! Time: ' + str(timer()-start))
+    Best_DT(df_train, df_tests_with_label)
+    print('Best-DT Done! Time: ' + str(timer()-start))
+    PER(df_train, df_tests_with_label)
+    print('PER Done! Time: ' + str(timer()-start))
+    Base_MLP(df_train, df_tests_with_label)
+    print('Base-MLP Done! Time: ' + str(timer()-start))
+    Best_MLP(df_train, df_tests_with_label)
+    print('Best-MLP Done! Time: ' + str(timer()-start))
+    end = timer()
+    print('Total time: '+end - start)
 
 if __name__ == '__main__':
     main()
