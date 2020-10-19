@@ -1,6 +1,7 @@
 # :beers: COMP 472 – Assignment 1 :tiger:
 
-[Repo URL](https://github.com/AxelBogos/COMP472_A1)
+[Repo URL](https://github.com/AxelBogos/COMP472_A1) <br>
+[Google Colab Notebook](https://colab.research.google.com/drive/1z5IqdQMRNb3Uyo8YO0zG7aFrire5tizM?usp=sharing)
 ---
 
 Axel Bogos - 40077502 <br>
@@ -23,7 +24,7 @@ Xavier Morin - 40077865
 
 ---
 
-Execute the main() function of ```main.py```. This will execute the following functions and model calls, in that order: 
+Execute the main() function of ```main.py``` (also accessible with [this](https://colab.research.google.com/drive/1z5IqdQMRNb3Uyo8YO0zG7aFrire5tizM?usp=sharing) Colab notebook). main() will execute the following functions and model calls, in that order: 
 ```python
     plot_data(df_train)
     GNB(df_train,df_val)
